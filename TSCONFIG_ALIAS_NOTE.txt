@@ -1,0 +1,10 @@
+경로 별칭(@/...)이 안 먹으면 tsconfig.json에 아래가 있어야 합니다.
+
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"]
+    }
+  }
+}

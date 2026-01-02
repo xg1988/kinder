@@ -1,0 +1,10 @@
+package.json 에 아래 dependencies가 있어야 빌드됩니다.
+
+"dependencies": {
+  ...
+  "@supabase/supabase-js": "^2",
+  "@supabase/ssr": "^0"
+}
+
+(없으면) 로컬에서:
+  npm i @supabase/supabase-js @supabase/ssr

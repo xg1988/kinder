@@ -1,0 +1,30 @@
+1) 로컬에서 실행 중(예: http://localhost:3000)일 때
+
+# 회원가입 (Supabase Auth의 이메일 확인 OFF면 바로 로그인 가능 / ON이면 메일 인증 후 로그인)
+curl -i -X POST http://localhost:3000/api/auth/signup \
+  -H "content-type: application/json" \
+  -d '{"email":"test1@example.com","password":"Passw0rd!Passw0rd!"}'
+
+# 로그인(쿠키 저장) - cookie.txt 파일에 세션 쿠키가 저장됨
+curl -i -c cookie.txt -X POST http://localhost:3000/api/auth/signin \
+  -H "content-type: application/json" \
+  -d '{"email":"test1@example.com","password":"Passw0rd!Passw0rd!"}'
+
+# 내 정보 확인
+curl -i -b cookie.txt http://localhost:3000/api/auth/me
+
+# 시설 조회(로그인 필요)
+curl -i -b cookie.txt "http://localhost:3000/api/kindergartens?limit=10&offset=0"
+
+# 즐겨찾기 추가
+curl -i -b cookie.txt -X POST http://localhost:3000/api/favorites \
+  -H "content-type: application/json" \
+  -d '{"facility_id":1}'
+
+# 알림 규칙 생성
+curl -i -b cookie.txt -X POST http://localhost:3000/api/alerts \
+  -H "content-type: application/json" \
+  -d '{"frequency":"daily","sido":"서울특별시","sigungu":"강서구","eupmyeondong":"마곡동","criteria":{"event":"announcement_update"}}'
+
+# 로그아웃
+curl -i -b cookie.txt -X POST http://localhost:3000/api/auth/signout
