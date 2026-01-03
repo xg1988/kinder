@@ -1,0 +1,15 @@
+로컬 테스트(예: http://localhost:3000)
+
+# 1) 인증번호(OTP) 요청
+curl -i -X POST http://localhost:3000/api/auth/request-otp \
+  -H "content-type: application/json" \
+  -d '{"email":"your_real_email@domain.com"}'
+
+# 2) 메일로 받은 코드(OTP) 검증 + 비밀번호 설정(선택)
+#    -c cookie.txt : 세션 쿠키 저장
+curl -i -c cookie.txt -X POST http://localhost:3000/api/auth/verify-otp \
+  -H "content-type: application/json" \
+  -d '{"email":"your_real_email@domain.com","code":"123456","password":"Passw0rd!Passw0rd!"}'
+
+# 3) 세션 확인
+curl -i -b cookie.txt http://localhost:3000/api/auth/me
