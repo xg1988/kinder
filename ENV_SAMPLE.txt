@@ -1,0 +1,17 @@
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=...
+NEXT_PUBLIC_SUPABASE_ANON_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+
+# Ingest endpoint + keys
+# (권장) data.go.kr/기관 문서에서 확인한 실제 URL로 지정
+CHILDCARE_API_ENDPOINT=https://info.childcare.go.kr/info/oais/openapi/OpenApiSlL.jsp
+DATA_GO_KR_SERVICE_KEY=YOUR_DATA_GO_KR_SERVICE_KEY_URLENCODED
+
+KINDER_API_ENDPOINT=YOUR_E_CHILDSCHOOLINFO_ENDPOINT
+KINDER_API_KEY=YOUR_KEY_IF_NEEDED
+
+# Protect /api/admin/ingest
+CRON_SECRET=some-long-random
+
+INGEST_PAGE_SIZE=200

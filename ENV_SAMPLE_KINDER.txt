@@ -1,0 +1,15 @@
+# 유치원알리미 OpenAPI (basicInfo2.do)
+KINDER_API_ENDPOINT=https://e-childschoolinfo.moe.go.kr/api/notice/basicInfo2.do
+KINDER_API_KEY=YOUR_OPENAPI_KEY
+
+# 적재할 시도/시군구 코드 (둘 중 하나 방식)
+# 1) 여러 지역:
+KINDER_CODE_PAIRS=27:27140,11:11680
+
+# 2) 단일 지역:
+# KINDER_SIDO_CODE=27
+# KINDER_SGG_CODE=27140
+
+# 옵션
+KINDER_PAGE_CNT=200
+# KINDER_TIMING=20252
