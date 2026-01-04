@@ -15,27 +15,30 @@
       --brand: #667eea;
       --brand2:#764ba2;
       --shadow: 0 12px 35px rgba(0,0,0,0.10);
-      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
+      --navH: calc(var(--navBase) + var(--safeB));
       --radius: 18px;
     }
     html, body{height:100%;}
     body{
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg);
-      height: 100vh;
-      overflow: hidden;
+      min-height: 100vh;
+      overflow-y: auto; overflow-x: hidden;
       color: var(--ink);
     }
     .container{
       max-width: 600px;
       margin: 0 auto;
-      height: 100dvh; min-height: 100dvh;
+      height: var(--vh, 100vh);
+      min-height: var(--vh, 100vh);
+      /* fallback for browsers supporting dynamic viewport */
+      height: 100dvh;
+      min-height: 100dvh;
       position: relative;
       background: linear-gradient(135deg, #f6f7ff 0%, #fff2f6 100%);
       box-shadow: 0 0 20px rgba(0,0,0,0.10);
-      overflow: hidden;
-            padding-bottom: calc(var(--navH) + 80px);
-    }
+      overflow: visible;
+}
 
     /* Header */
     .header{
@@ -92,15 +95,17 @@
     }
 
     .content{
-      position:absolute;
+position:absolute;
       left:0; right:0;
       top: 86px; /* header total height */
-      bottom: 0;
-      overflow: auto;
+      bottom: var(--navH);
+overflow-y: auto; overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
       padding: 16px;
-      padding-bottom: calc(var(--navH) + 16px);
+      /* ensure last content isn't hidden behind bottom nav (mobile-safe) */
+      padding-bottom: 24px;
+      scroll-padding-bottom: 24px;
     }
-
     .hero{
       background: rgba(255,255,255,0.92);
       border-radius: 22px;
@@ -197,7 +202,7 @@
       display:flex;
       justify-content:space-around;
       align-items:center;
-      padding: 12px 0 calc(10px + env(safe-area-inset-bottom));
+      padding: 12px 0 calc(10px + var(--safeB));
       box-shadow: 0 -8px 25px rgba(0,0,0,0.08);
       z-index: 999;
     }
@@ -228,7 +233,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      padding:  15px 0 calc(env(safe-area-inset-bottom) + 10px);
+      padding:  15px 0 calc(var(--safeB) + 10px);
       border-radius: 18px;
       background: rgba(255,255,255,0.92);
       border: 1px solid rgba(255,255,255,0.65);
@@ -302,7 +307,112 @@
       color: var(--ink);
     }
     
-  </style>
+  
+    /* Hero Swiper (banner) */
+    .hero-swiper{
+      margin: 14px 0 10px;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(255,255,255,0.55);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.10);
+    }
+    .hero-track{
+      display:flex;
+      width:100%;
+      transition: transform .35s ease;
+      will-change: transform;
+      touch-action: pan-y;
+    }
+    .hero-slide{
+      position: relative;
+      min-width: 100%;
+      padding: 18px 16px 16px;
+      height: 148px;
+      color: #fff;
+      cursor: pointer;
+      user-select: none;
+    }
+    .hero-slide .hero-top{
+      display:flex;
+      gap:8px;
+      margin-bottom: 10px;
+      align-items:center;
+    }
+    .hero-pill{
+      display:inline-flex;
+      align-items:center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.28);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -0.2px;
+      backdrop-filter: blur(8px);
+    }
+    .hero-pill.ghost{ background: rgba(255,255,255,0.12); }
+    .hero-title{
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: -0.6px;
+      line-height: 1.1;
+      margin-bottom: 6px;
+      max-width: 78%;
+    }
+    .hero-desc{
+      font-size: 13px;
+      opacity: .92;
+      line-height: 1.25;
+      max-width: 78%;
+      margin-bottom: 10px;
+    }
+    .hero-btn{
+      appearance:none;
+      border: none;
+      border-radius: 12px;
+      padding: 9px 12px;
+      font-weight: 900;
+      font-size: 13px;
+      background: rgba(255,255,255,0.92);
+      color: rgba(20,20,20,0.92);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+      cursor:pointer;
+    }
+    .hero-art{
+      position:absolute;
+      right: 14px;
+      bottom: 12px;
+      font-size: 44px;
+      filter: drop-shadow(0 10px 18px rgba(0,0,0,0.25));
+      opacity: .95;
+    }
+    .hero-slide.s1{ background: linear-gradient(135deg, var(--brand), var(--brand2)); }
+    .hero-slide.s2{ background: linear-gradient(135deg, #14b8a6, #8b5cf6); }
+    .hero-slide.s3{ background: linear-gradient(135deg, #f97316, #ec4899); }
+
+    .hero-dots{
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      align-items:center;
+      padding: 10px 0 12px;
+      background: rgba(255,255,255,0.72);
+    }
+    .hero-dot{
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      border: none;
+      background: rgba(40,40,40,0.22);
+      cursor:pointer;
+    }
+    .hero-dot.is-active{
+      width: 18px;
+      background: rgba(40,40,40,0.55);
+    }
+
+</style>
   <script src="config.js"></script>
 </head>
 <body>
@@ -333,23 +443,47 @@
           <button class="cta secondary" onclick="goFavorite()">관심 목록</button>
         </div>
 
-      <div class="banner-row">
-        <div class="banner" onclick="window.location.href='map.html'">
-          <div class="b-emoji">🚌</div>
-          <div class="b-txt">
-            <div class="b-title">통학버스 유치원</div>
-            <div class="b-desc">지도에서 필터로 빠르게 찾아요</div>
+      
+      <div class="hero-swiper" aria-label="프로모션 배너">
+        <div class="hero-track" id="heroTrack">
+          <div class="hero-slide s1" data-href="map.html">
+            <div class="hero-top">
+              <span class="hero-pill">지도</span>
+              <span class="hero-pill ghost">필터·검색</span>
+            </div>
+            <div class="hero-title">지도에서 한 번에 찾기</div>
+            <div class="hero-desc">검색 + 필터로 원하는 조건만 쏙 골라보세요.</div>
+            <button class="hero-btn" type="button">지도 열기</button>
+            <div class="hero-art" aria-hidden="true">🗺️</div>
           </div>
-          <div class="b-cta">→</div>
+
+          <div class="hero-slide s2" data-href="favorite.html">
+            <div class="hero-top">
+              <span class="hero-pill">관심</span>
+              <span class="hero-pill ghost">빠른 비교</span>
+            </div>
+            <div class="hero-title">관심 유치원 모아보기</div>
+            <div class="hero-desc">하트로 저장해두고, 다시 찾아볼 때 1초 컷.</div>
+            <button class="hero-btn" type="button">관심 목록</button>
+            <div class="hero-art" aria-hidden="true">❤️</div>
+          </div>
+
+          <div class="hero-slide s3" data-href="detail.html?id=1">
+            <div class="hero-top">
+              <span class="hero-pill">체크</span>
+              <span class="hero-pill ghost">입학 준비</span>
+            </div>
+            <div class="hero-title">입학 준비 체크리스트</div>
+            <div class="hero-desc">필수 서류·준비물, 놓치기 쉬운 항목까지 정리.</div>
+            <button class="hero-btn" type="button">바로 보기</button>
+            <div class="hero-art" aria-hidden="true">✅</div>
+          </div>
         </div>
 
-        <div class="banner soft" onclick="window.location.href='detail.html?id=1'">
-          <div class="b-emoji">🎒</div>
-          <div class="b-txt">
-            <div class="b-title">입학 준비 체크</div>
-            <div class="b-desc">필수 서류·준비물 한 번에</div>
-          </div>
-          <div class="b-cta">→</div>
+        <div class="hero-dots" id="heroDots" aria-label="배너 페이지">
+          <button type="button" class="hero-dot is-active" aria-label="배너 1"></button>
+          <button type="button" class="hero-dot" aria-label="배너 2"></button>
+          <button type="button" class="hero-dot" aria-label="배너 3"></button>
         </div>
       </div>
 
@@ -427,13 +561,103 @@
     </div>
 
 <script>
-    function goHome(){ window.location.href = "main.html"; }
-    function goMap(){ window.location.href = "map.html"; }
-    function goFavorite(){ window.location.href = "favorite.html"; }
-  
-    function goLogin(){
-      window.location.href = "login.html";
+    // Fix mobile viewport height issues (iOS/Android address bar)
+    function setVh(){
+      document.documentElement.style.setProperty('--vh', window.innerHeight + 'px');
     }
+    window.addEventListener('resize', setVh, {passive:true});
+    window.addEventListener('orientationchange', setVh, {passive:true});
+    setVh();
+
+    // Hero swiper (no library)
+    function initHeroSwiper(){
+      const track = document.getElementById('heroTrack');
+      const dotsWrap = document.getElementById('heroDots');
+      if(!track || !dotsWrap) return;
+
+      const slides = Array.from(track.querySelectorAll('.hero-slide'));
+      const dots = Array.from(dotsWrap.querySelectorAll('.hero-dot'));
+      let idx = 0;
+      let startX = 0;
+      let dx = 0;
+      let dragging = false;
+      let timer = null;
+
+      function render(){
+        track.style.transform = `translateX(${-idx*100}%)`;
+        dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+      }
+      function go(next){
+        idx = (next + slides.length) % slides.length;
+        render();
+      }
+      function startAuto(){
+        stopAuto();
+        timer = setInterval(()=>go(idx+1), 4500);
+      }
+      function stopAuto(){
+        if(timer){ clearInterval(timer); timer=null; }
+      }
+
+      slides.forEach(sl=>{
+        sl.addEventListener('click', (e)=>{
+          // if user clicked a button, still route
+          const href = sl.getAttribute('data-href');
+          if(href) window.location.href = href;
+        });
+        const btn = sl.querySelector('.hero-btn');
+        if(btn){
+          btn.addEventListener('click', (e)=>{
+            e.stopPropagation();
+            const href = sl.getAttribute('data-href');
+            if(href) window.location.href = href;
+          });
+        }
+      });
+
+      dots.forEach((d,i)=>{
+        d.addEventListener('click', ()=>{
+          go(i);
+          startAuto();
+        });
+      });
+
+      // touch / swipe
+      track.addEventListener('touchstart', (e)=>{
+        if(!e.touches || e.touches.length!==1) return;
+        dragging = true;
+        startX = e.touches[0].clientX;
+        dx = 0;
+        stopAuto();
+      }, {passive:true});
+
+      track.addEventListener('touchmove', (e)=>{
+        if(!dragging || !e.touches || e.touches.length!==1) return;
+        dx = e.touches[0].clientX - startX;
+      }, {passive:true});
+
+      track.addEventListener('touchend', ()=>{
+        if(!dragging) return;
+        dragging = false;
+        const threshold = 40; // px
+        if(dx > threshold) go(idx-1);
+        else if(dx < -threshold) go(idx+1);
+        startAuto();
+      });
+
+      render();
+      startAuto();
+    }
+
+function goHome(){ window.location.href = "main.html"; }
+function goMap(){ window.location.href = "map.html"; }
+function goFavorite(){ window.location.href = "favorite.html"; }
+
+function goLogin(){
+  window.location.href = "login.html";
+}
+
+document.addEventListener('DOMContentLoaded', initHeroSwiper);
 </script>
 </body>
 </html>
