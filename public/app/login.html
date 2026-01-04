@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>로그인 | 우리 아이 유치원 찾기</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#f3f5ff;
+      --card:#ffffff;
+      --ink:#2b2f38;
+      --muted:#6b7280;
+      --brand:#667eea;
+      --brand2:#764ba2;
+      --shadow:0 12px 35px rgba(0,0,0,0.10);
+      --radius:18px;
+    
+      --navBase: 72px;
+      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
+    }
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background:var(--bg);
+      height:100vh;
+      overflow:hidden;
+      color:var(--ink);
+    }
+    .container{
+      max-width:600px;
+      margin:0 auto;
+      height:100vh;
+      position:relative;
+      background:linear-gradient(135deg,#f6f7ff 0%,#fff2f6 100%);
+      box-shadow:0 0 20px rgba(0,0,0,0.10);
+      overflow:hidden;
+            padding-bottom: calc(var(--navH) + 16px);
+    }
+
+    .header{
+      position:absolute;
+      top:0;left:0;right:0;
+      padding:16px 16px 12px;
+      background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+      color:#fff;
+      z-index:50;
+      box-shadow:0 2px 12px rgba(0,0,0,0.10);
+    }
+    .title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    .app-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight:900;
+      letter-spacing:-0.2px;
+    }
+    .logo{
+      width:34px;height:34px;
+      border-radius:12px;
+      background:rgba(255,255,255,0.22);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 8px 20px rgba(0,0,0,0.12);
+      backdrop-filter:blur(10px);
+    }
+    .logo span{font-size:18px;}
+    .sub{
+      font-size:12px;
+      opacity:0.92;
+    }
+    .back-btn{
+      border:0;
+      cursor:pointer;
+      padding:9px 12px;
+      border-radius:999px;
+      font-weight:900;
+      font-size:13px;
+      letter-spacing:-0.2px;
+      color:#fff;
+      background:rgba(255,255,255,0.20);
+      box-shadow:0 10px 22px rgba(0,0,0,0.14);
+      backdrop-filter:blur(10px);
+      display:flex;
+      align-items:center;
+      gap:6px;
+      transition:transform .12s ease, background .2s ease;
+      user-select:none;
+    }
+    .back-btn:hover{background:rgba(255,255,255,0.28);}
+    .back-btn:active{transform:scale(0.98);}
+
+    .content{
+      position:absolute;
+      left:0;right:0;
+      top:72px;
+      bottom: 0;
+      padding:16px;
+      overflow:auto;
+    }
+
+    .card{
+      background:rgba(255,255,255,0.94);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:var(--shadow);
+      border:1px solid rgba(255,255,255,0.7);
+    }
+    .card h1{
+      font-size:20px;
+      margin-bottom:10px;
+      letter-spacing:-0.3px;
+    }
+    .card p{
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.5;
+      margin-bottom:16px;
+    }
+
+    .field{
+      margin-bottom:12px;
+    }
+    .label{
+      font-size:12px;
+      font-weight:800;
+      color:#4b5563;
+      margin-bottom:6px;
+      display:flex;
+      align-items:center;
+      gap:6px;
+    }
+    .input{
+      width:100%;
+      padding:13px 14px;
+      border-radius:16px;
+      border:2px solid rgba(102,126,234,0.18);
+      outline:none;
+      background:#fff;
+      font-size:14px;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    .input:focus{
+      border-color:rgba(102,126,234,0.55);
+      box-shadow:0 0 0 4px rgba(102,126,234,0.12);
+    }
+
+    .btn-row{
+      display:flex;
+      gap:10px;
+      margin-top:14px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      flex:1;
+      min-width:140px;
+      border:0;
+      cursor:pointer;
+      border-radius:16px;
+      padding:14px 14px;
+      font-weight:900;
+      letter-spacing:-0.2px;
+      transition:transform .12s ease;
+    }
+    .btn:active{transform:scale(0.98);}
+    .btn.primary{
+      color:#fff;
+      background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+      box-shadow:0 10px 25px rgba(102,126,234,0.25);
+    }
+    .btn.secondary{
+      color:var(--ink);
+      background:#fff;
+      border:2px solid rgba(102,126,234,0.25);
+      box-shadow:0 10px 25px rgba(0,0,0,0.06);
+    }
+
+    .link-row{margin-top:12px; display:flex; justify-content:center; gap:6px; font-size:13px; color: var(--muted);} 
+    .link-row a{color: var(--brand); font-weight:800; text-decoration:none;} 
+    .link-row a:hover{text-decoration:underline;}
+
+    .note{
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+      background:rgba(102,126,234,0.08);
+      border-radius:16px;
+      padding:12px;
+    }
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-row">
+        <div class="app-title">
+          <div class="logo"><span>🧸</span></div>
+          <div>
+            <div style="font-size:16px; font-weight:900;">로그인</div>
+            <div class="sub">우리 아이 유치원 찾기</div>
+          </div>
+        </div>
+        <button class="back-btn" onclick="goBack()" aria-label="뒤로">
+          <span>⬅️</span>
+          <span>뒤로</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h1>다시 만나서 반가워요 ✨</h1>
+        <p>관심 목록을 저장하려면 로그인이 필요해요. (샘플 UI라 실제 인증은 하지 않습니다)</p>
+
+        <div class="field">
+          <div class="label">📧 아이디(이메일)</div>
+          <input class="input" type="email" placeholder="example@email.com" autocomplete="username" />
+        </div>
+
+        <div class="field">
+          <div class="label">🔒 비밀번호</div>
+          <input class="input" type="password" placeholder="비밀번호를 입력하세요" autocomplete="current-password" />
+        </div>
+
+        <div class="btn-row">
+          <button class="btn primary" onclick="login()">로그인</button>
+          <button class="btn secondary" onclick="goBack()">취소</button>
+        </div>
+
+        <div class="link-row">계정이 없으신가요? <a href="signup.html" onclick="goSignup(); return false;">회원가입</a></div>
+
+        <div class="note">💡 다음 단계(원하시면): 로그인 성공 시 localStorage에 토큰/사용자 정보를 저장하고, 관심(❤️)을 계정별로 동기화할 수 있어요.</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function goSignup(){
+      window.location.href = "signup.html";
+    }
+
+    function goBack(){
+      window.location.href = "main.html";
+    }
+    function login(){
+      alert("로그인 완료(샘플)!");
+      window.location.href = "main.html";
+    }
+  </script>
+</body>
+</html>

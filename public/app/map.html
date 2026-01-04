@@ -1,0 +1,841 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유치원 지도</title>
+    <style>
+        :root{--navBase:72px;--navH:calc(var(--navBase) + env(safe-area-inset-bottom));--headerH:116px;--brand:#06b6d4;--brand2:#8b5cf6;--accent:var(--brand2);--chipBg:rgba(255,255,255,0.22);}
+
+
+        /* ===== favorite 헤더 스타일을 지도에 이식 ===== */
+        .header.map-header{
+              position:absolute;
+              top:0; left:0; right:0;
+              height: var(--headerH);
+              padding: 14px 16px 12px;
+              background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+              color:white;
+              z-index: 120;
+              box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+            }
+        .title-row{
+              display:flex;
+              align-items:center;
+              justify-content:space-between;
+              gap: 12px;
+              margin-bottom: 10px;
+            }
+        .app-title{
+              display:flex;
+              align-items:center;
+              gap:8px;
+              font-weight: 900;
+              letter-spacing: -0.2px;
+              font-size: 17px;
+            }
+        .logo{
+              width: 34px; height: 34px;
+              border-radius: 12px;
+              background: var(--chipBg);
+              display:flex; align-items:center; justify-content:center;
+              box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+              backdrop-filter: blur(10px);
+              flex-shrink:0;
+            }
+        .count-chip{
+              background: var(--chipBg);
+              border: 1px solid rgba(255,255,255,0.40);
+              padding: 10px 12px;
+              border-radius: 999px;
+              font-size: 12px;
+              font-weight: 900;
+              white-space: nowrap;
+              backdrop-filter: blur(10px);
+            }
+        .map-header .search-row{
+              display:flex;
+              gap: 10px;
+              align-items:center;
+            }
+        .map-header .search-wrap{
+              flex:1;
+              position:relative;
+            }
+        .map-header .search-input{
+              width:100%;
+              border: none;
+              outline: none;
+              padding: 12px 40px 12px 14px;
+              border-radius: 999px;
+              font-size: 14px;
+              background: rgba(255,255,255,0.95);
+              box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+            }
+        .map-header .search-icon{
+              position:absolute;
+              right: 14px;
+              top: 50%;
+              transform: translateY(-50%);
+              font-size: 18px;
+              opacity: 0.7;
+            }
+        .header.map-header{padding-bottom:14px;}
+        .map-header .search-wrap{position:relative;}
+        .map-header .filter-btn{
+          flex:0 0 auto;
+          border:none;
+          background:rgba(255,255,255,0.90);
+          width:44px;height:44px;
+          border-radius:16px;
+          cursor:pointer;
+          box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+          display:flex;align-items:center;justify-content:center;
+        }
+        .map-header .search-input{padding-right:44px;}
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            height: 100vh;
+            padding-bottom: var(--navH);
+            position: relative;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* 상단 검색바 */
+        .search-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 15px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+.search-header .search-box {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+.search-header .search-input {
+            flex: 1;
+            padding: 12px 40px 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            outline: none;
+            transition: all 0.3s;
+        }
+.search-header .search-input:focus {
+            border-color: var(--accent);
+        }
+.search-header .search-icon {
+            position: absolute;
+            right: 75px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            color: #999;
+        }
+.search-header .filter-btn {
+            background: white;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+.search-header .filter-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        /* 지도 영역 */
+        .map-container {
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* 가상 지도 그리드 */
+        .map-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.1) 49px, rgba(255,255,255,0.1) 50px),
+                repeating-linear-gradient(90deg, transparent, transparent 49px, rgba(255,255,255,0.1) 49px, rgba(255,255,255,0.1) 50px);
+        }
+
+        /* 지도 마커들 */
+        .marker {
+            position: absolute;
+            cursor: pointer;
+            transition: all 0.3s;
+            animation: markerAppear 0.5s ease-out;
+        }
+
+        @keyframes markerAppear {
+            from {
+                transform: scale(0) translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .marker:hover {
+            transform: scale(1.2);
+            z-index: 50;
+        }
+
+        .marker-icon {
+            width: 40px;
+            height: 50px;
+            background: #ff6b6b;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .marker-icon::before {
+            content: '🏫';
+            transform: rotate(45deg);
+            font-size: 20px;
+        }
+
+        .marker.public .marker-icon {
+            background: #4dabf7;
+        }
+
+        .marker.private .marker-icon {
+            background: #ff6b6b;
+        }
+
+        .marker.national .marker-icon {
+            background: #51cf66;
+        }
+
+        /* 마커 툴팁 */
+        .marker-tooltip {
+            position: absolute;
+            bottom: 60px;
+            left: 50%;
+            transform: translateX(-50%) scale(0);
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            white-space: nowrap;
+            font-size: 13px;
+            font-weight: 600;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+
+        .marker:hover .marker-tooltip {
+            transform: translateX(-50%) scale(1);
+        }
+
+        .marker-tooltip::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 8px solid transparent;
+            border-right: 8px solid transparent;
+            border-top: 8px solid white;
+        }
+
+        /* 현재 위치 마커 */
+        .my-location {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            border: 4px solid white;
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(102, 126, 234, 0);
+            }
+        }
+
+        /* 하단 카드 리스트 */
+        .bottom-sheet {
+            position: absolute;
+            bottom: var(--navH);
+            left: 0;
+            right: 0;
+            background: white;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -2px 20px rgba(0,0,0,0.1);
+            max-height: 250px;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+
+        .bottom-sheet.minimized {
+            max-height: 80px;
+        }
+
+        .sheet-handle {
+            width: 40px;
+            height: 4px;
+            background: #ddd;
+            border-radius: 2px;
+            margin: 12px auto;
+            cursor: pointer;
+        }
+
+        .sheet-content {
+            padding: 0 15px 15px;
+        }
+
+        .kindergarten-mini-card {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .kindergarten-mini-card:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+
+        .mini-card-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--brand2) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .mini-card-info {
+            flex: 1;
+        }
+
+        .mini-card-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .mini-card-distance {
+            font-size: 12px;
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        /* 줌 컨트롤 */
+        .zoom-controls {
+            position: absolute;
+            right: 15px;
+            top: calc(var(--headerH) + 12px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 90;
+        }
+
+        .zoom-btn {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        .zoom-btn:hover {
+            background: #f0f0f0;
+            transform: scale(1.1);
+        }
+
+        /* 내 위치 버튼 */
+        .my-location-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 340px;
+            width: 45px;
+            height: 45px;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            z-index: 90;
+        }
+
+        .my-location-btn:hover {
+            background: var(--accent);
+            transform: scale(1.1);
+        }
+
+        /* 필터 패널 */
+        .filter-panel {
+            position: absolute;
+            top: calc(var(--headerH) + 10px);
+            left: 15px;
+            right: 15px;
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            display: none;
+            z-index: 95;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .filter-panel.active {
+            display: block;
+        }
+
+        .filter-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .filter-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-option {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .filter-option:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .filter-option.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        /* 하단 탭바 */
+        .bottom-nav {
+            position: fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: 0;
+            width: min(600px, 100%);
+            height: var(--navH);
+            background: rgba(255,255,255,0.92);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 12px 0 calc(10px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 25px rgba(0,0,0,0.08);
+            z-index: 100;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+            flex: 1;
+        }
+
+        .nav-item:hover {
+            color: var(--accent);
+        }
+
+        .nav-item.active {
+            color: var(--accent);
+        }
+
+        .nav-icon {
+            font-size: 24px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+        }
+
+        /* 카운터 배지 */
+        .marker-count {
+            position: absolute;
+            top: 75px;
+            left: 15px;
+            background: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 90;
+        }
+
+        .count-number {
+            color: var(--accent);
+        }
+    </style>
+  <script src="config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 상단 헤더 -->
+        <div class="header map-header">
+          <div class="title-row">
+            <div class="app-title">
+              <div class="logo"><span>📍</span></div>
+              <span>유치원 지도</span>
+            </div>
+            <div class="count-chip">주변 <span id="markerCount">0</span>개</div>
+          </div>
+        
+          <div class="search-row">
+            <div class="search-wrap">
+              <input 
+                type="text"
+                id="mapSearchInput"
+                class="search-input"
+                placeholder="지역, 유치원 이름 검색"
+              />
+              <span class="search-icon">🔍</span>
+            </div>
+            <button class="filter-btn" onclick="toggleFilter()" aria-label="필터">⚙️</button>
+          </div>
+        </div>
+
+        <!-- 필터 패널 -->
+                <div class="filter-panel" id="filterPanel">
+                    <div class="filter-title">필터 옵션</div>
+                    <div class="filter-options">
+                        <button class="filter-option active" onclick="filterType(this, 'all')">전체</button>
+                        <button class="filter-option" onclick="filterType(this, 'public')">공립</button>
+                        <button class="filter-option" onclick="filterType(this, 'private')">사립</button>
+                        <button class="filter-option" onclick="filterType(this, 'national')">국립</button>
+                        <button class="filter-option" onclick="filterType(this, 'bus')">통학버스 🚌</button>
+                        <button class="filter-option" onclick="filterType(this, '500m')">500m 이내</button>
+                        <button class="filter-option" onclick="filterType(this, '1km')">1km 이내</button>
+                    </div>
+                </div>
+        
+                
+
+        <!-- 지도 영역 -->
+        <div class="map-container" id="mapContainer">
+            <div class="map-grid"></div>
+
+            <!-- 내 위치 -->
+            <div class="my-location" style="top: 50%; left: 50%;"></div>
+
+            <!-- 유치원 마커들 (JS 렌더링) -->
+            <div id="markersLayer"></div>
+        </div>
+
+        <!-- 줌 컨트롤 -->
+        <div class="zoom-controls">
+            <button class="zoom-btn" onclick="zoomIn()">+</button>
+            <button class="zoom-btn" onclick="zoomOut()">−</button>
+        </div>
+
+        <!-- 내 위치 버튼 -->
+        <button class="my-location-btn" onclick="goToMyLocation()">📍</button>
+
+        <!-- 하단 시트 -->
+        <div class="bottom-sheet" id="bottomSheet">
+            <div class="sheet-handle" onclick="toggleSheet()"></div>
+            <div class="sheet-content" id="listContainer"></div>
+        </div>
+
+        <!-- 하단 탭바 -->
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="window.location.href='main.html'">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">홈</span>
+            </div>
+            <div class="nav-item active">
+                <span class="nav-icon">📍</span>
+                <span class="nav-label">지도</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='favorite.html'">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">관심</span>
+            </div>
+        </div>
+    </div>
+
+    
+<script>
+  // ===== 데이터(데모) =====
+  const KINDERGARTENS = [
+    { id: 1, name: '해바라기 유치원', type: 'public',  bus: true,  distanceM: 300, walk: '도보 5분',  pos:{top:'45%', left:'55%'}, icon:'🌻' },
+    { id: 2, name: '별초롱 유치원',   type: 'private', bus: false, distanceM: 500, walk: '도보 8분',  pos:{top:'60%', left:'45%'}, icon:'⭐' },
+    { id: 3, name: '무지개 어린이집', type: 'public',  bus: false, distanceM: 750, walk: '도보 10분', pos:{top:'35%', left:'60%'}, icon:'🌈' },
+    { id: 4, name: '푸른하늘 유치원', type: 'private', bus: true,  distanceM: 850, walk: '도보 12분', pos:{top:'55%', left:'40%'}, icon:'🎈' },
+    { id: 5, name: '국립 꿈나무 유치원', type:'national', bus:false, distanceM: 1200, walk:'도보 15분', pos:{top:'40%', left:'50%'}, icon:'🌸' },
+    { id: 6, name: '햇살가득 유치원', type: 'private', bus: true,  distanceM: 650, walk: '도보 9분',  pos:{top:'65%', left:'55%'}, icon:'☀️' },
+    { id: 7, name: '사랑나눔 어린이집', type:'public',  bus:false, distanceM: 900, walk:'도보 13분', pos:{top:'30%', left:'45%'}, icon:'💛' },
+    { id: 8, name: '예쁜세상 유치원', type: 'private', bus:false, distanceM: 700, walk:'도보 11분', pos:{top:'50%', left:'65%'}, icon:'🎀' },
+  ];
+
+  let currentZoom = 1;
+  let currentFilter = 'all';
+  let searchTerm = '';
+
+  // ===== 필터 토글 (패널: 아래 화면 위로) =====
+  function toggleFilter() {
+    const panel = document.getElementById('filterPanel');
+    panel.classList.toggle('active');
+  }
+
+  function closeFilter() {
+    document.getElementById('filterPanel').classList.remove('active');
+  }
+
+  // 필터 선택: 선택하면 목록(마커/리스트) 갱신 + 패널 닫기
+  function filterType(btn, type) {
+    // 버튼 UI
+    document.querySelectorAll('.filter-option').forEach(opt => opt.classList.remove('active'));
+    btn.classList.add('active');
+
+    currentFilter = type;
+    renderAll();
+    closeFilter();
+  }
+
+  // ===== 줌 =====
+  function zoomIn() {
+    currentZoom = Math.min(currentZoom + 0.2, 2);
+    applyTransform();
+  }
+
+  function zoomOut() {
+    currentZoom = Math.max(currentZoom - 0.2, 0.5);
+    applyTransform();
+  }
+
+  function applyTransform() {
+    const map = document.getElementById('mapContainer');
+    map.style.transform = `scale(${currentZoom}) translate(${currentX}px, ${currentY}px)`;
+  }
+
+  function goToMyLocation() {
+    currentZoom = 1;
+    currentX = 0; currentY = 0;
+    applyTransform();
+  }
+
+  // ===== 렌더링 =====
+  function getFiltered() {
+    let list = KINDERGARTENS.slice();
+
+    // 검색
+    if (searchTerm) {
+      const t = searchTerm.toLowerCase();
+      list = list.filter(k => k.name.toLowerCase().includes(t));
+    }
+
+    // 필터
+    switch (currentFilter) {
+      case 'public':
+      case 'private':
+      case 'national':
+        list = list.filter(k => k.type === currentFilter);
+        break;
+      case 'bus':
+        list = list.filter(k => !!k.bus);
+        break;
+      case '500m':
+        list = list.filter(k => k.distanceM <= 500);
+        break;
+      case '1km':
+        list = list.filter(k => k.distanceM <= 1000);
+        break;
+      default:
+        break;
+    }
+    return list;
+  }
+
+  function updateCount(n) {
+    const el = document.getElementById('markerCount');
+    if (el) el.textContent = String(n);
+  }
+
+  function renderMarkers(list) {
+    const layer = document.getElementById('markersLayer');
+    if (!layer) return;
+    layer.innerHTML = '';
+
+    list.forEach(k => {
+      const marker = document.createElement('div');
+      marker.className = `marker ${k.type}`;
+      marker.style.top = k.pos.top;
+      marker.style.left = k.pos.left;
+      marker.innerHTML = `
+        <div class="marker-icon"></div>
+        <div class="marker-tooltip">${k.name}</div>
+      `;
+      marker.addEventListener('click', () => goToDetail(k.id));
+      layer.appendChild(marker);
+    });
+  }
+
+  function renderList(list) {
+    const container = document.getElementById('listContainer');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const frag = document.createDocumentFragment();
+    list.forEach(k => {
+      const card = document.createElement('div');
+      card.className = 'kindergarten-mini-card';
+      card.innerHTML = `
+        <div class="mini-card-icon">${k.icon}</div>
+        <div class="mini-card-info">
+          <div class="mini-card-name">${k.name}</div>
+          <div class="mini-card-distance">${k.distanceM}m · ${k.walk}${k.bus ? ' · 🚌' : ''}</div>
+        </div>
+      `;
+      card.addEventListener('click', () => goToDetail(k.id));
+      frag.appendChild(card);
+    });
+
+    container.appendChild(frag);
+  }
+
+  function renderAll() {
+    const list = getFiltered();
+    renderMarkers(list);
+    renderList(list);
+    updateCount(list.length);
+  }
+
+  // ===== 상세 이동 =====
+  function goToDetail(id) {
+    window.location.href = `detail.html?id=${id}`;
+  }
+
+  // ===== 검색 =====
+  function onSearchInput(e) {
+    searchTerm = (e.target.value || '').trim();
+    renderAll();
+  }
+
+  // ===== 하단 시트 토글 =====
+  function toggleSheet() {
+    document.getElementById('bottomSheet').classList.toggle('minimized');
+  }
+
+  // ===== 드래그 =====
+  let isDragging = false;
+  let startX, startY;
+  let currentX = 0, currentY = 0;
+
+  window.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('mapSearchInput')?.addEventListener('input', onSearchInput);
+
+    const mapContainer = document.getElementById('mapContainer');
+    mapContainer.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX - currentX;
+      startY = e.clientY - currentY;
+      mapContainer.style.cursor = 'grabbing';
+    });
+
+    mapContainer.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      currentX = e.clientX - startX;
+      currentY = e.clientY - startY;
+      applyTransform();
+    });
+
+    mapContainer.addEventListener('mouseup', () => {
+      isDragging = false;
+      mapContainer.style.cursor = 'grab';
+    });
+
+    mapContainer.addEventListener('mouseleave', () => {
+      isDragging = false;
+      mapContainer.style.cursor = 'grab';
+    });
+
+    // 초기 렌더
+    renderAll();
+  });
+</script>
+
+</body>
+</html>

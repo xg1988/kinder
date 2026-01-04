@@ -1,0 +1,315 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>회원가입 | 우리 아이 유치원 찾기</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+    :root{
+      --bg:#f3f5ff;
+      --card:#ffffff;
+      --ink:#2b2f38;
+      --muted:#6b7280;
+      --brand:#667eea;
+      --brand2:#764ba2;
+      --shadow:0 12px 35px rgba(0,0,0,0.10);
+    
+      --navBase: 72px;
+      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
+    }
+    body{
+      font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      height:100vh;
+      overflow:hidden;
+      color: var(--ink);
+    }
+    .container{
+      max-width:600px;
+      margin:0 auto;
+      height:100vh;
+      position:relative;
+      background: linear-gradient(135deg, #f6f7ff 0%, #fff2f6 100%);
+      box-shadow: 0 0 20px rgba(0,0,0,0.10);
+      overflow:hidden;
+            padding-bottom: calc(var(--navH) + 16px);
+    }
+
+    .header{
+      position:absolute;
+      top:0;left:0;right:0;
+      padding:16px 16px 12px;
+      background:linear-gradient(135deg,var(--brand) 0%,var(--brand2) 100%);
+      color:#fff;
+      z-index:50;
+      box-shadow:0 2px 12px rgba(0,0,0,0.10);
+    }
+    .title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:10px;
+    }
+    .app-title{
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:-0.2px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .logo{
+      width:34px;height:34px;
+      border-radius:12px;
+      background: rgba(255,255,255,0.18);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+      font-size:18px;
+    }
+    .hint{
+      font-size:12px;
+      opacity:0.9;
+      font-weight:600;
+    }
+
+    .content{
+      position:absolute;
+      top:78px;
+      left:0; right:0;
+      bottom: 0;
+      padding:16px;
+      overflow:auto;
+    }
+    .card{
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(255,255,255,0.65);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    h1{font-size:18px;margin-bottom:8px;letter-spacing:-0.3px;}
+    p{color: var(--muted);font-size:13px;line-height:1.45;margin-bottom:14px;}
+
+    .field{margin:12px 0;}
+    .label{
+      font-size:13px;
+      font-weight:800;
+      margin-bottom:8px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .input{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border: 2px solid rgba(102,126,234,0.18);
+      background: #fff;
+      outline:none;
+      font-size:14px;
+      transition: border .2s, transform .2s;
+    }
+    .input:focus{border-color: rgba(102,126,234,0.55);transform: translateY(-1px);}
+
+    .btn-row{display:flex;gap:10px;margin-top: 14px;}
+    .btn{
+      flex:1;
+      padding:12px 14px;
+      border:none;
+      border-radius:14px;
+      font-weight:900;
+      cursor:pointer;
+      font-size:14px;
+      transition: transform .2s, filter .2s;
+    }
+    .btn:hover{transform: translateY(-1px); filter: brightness(1.02);}
+    .btn.primary{
+      color:#fff;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+      box-shadow: 0 12px 22px rgba(102,126,234,0.25);
+    }
+    .btn.secondary{
+      background: rgba(255,255,255,0.88);
+      color: var(--ink);
+      border: 2px solid rgba(102,126,234,0.18);
+    }
+
+    .link-row{
+      margin-top:12px;
+      display:flex;
+      justify-content:center;
+      gap:6px;
+      font-size:13px;
+      color: var(--muted);
+    }
+    .link-row a{color: var(--brand);font-weight:900;text-decoration:none;}
+    .link-row a:hover{text-decoration: underline;}
+
+    .note{
+      margin-top:14px;
+      font-size:12px;
+      color: #7c7f87;
+      line-height:1.45;
+      background: rgba(102,126,234,0.08);
+      border: 1px dashed rgba(102,126,234,0.22);
+      padding: 12px;
+      border-radius: 14px;
+    }
+  
+        .verify-row{display:flex; gap:10px; align-items:center;}
+        .btn-outline{border:2px solid rgba(102,126,234,0.9); color: rgba(102,126,234,0.95); background:#fff; padding:12px 14px; border-radius:14px; font-weight:800; cursor:pointer; white-space:nowrap;}
+        .btn-outline:active{transform: translateY(1px);}
+        .verify-hint{font-size:12px; color: rgba(0,0,0,0.45); line-height:1.2;}
+        .verify-msg{margin-top:8px; font-size:12px; font-weight:800;}
+        .verify-msg.ok{color:#2f9e44;}
+        .verify-msg.bad{color:#e03131;}
+    </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-row">
+        <div class="app-title">
+          <div class="logo"><span>🧸</span></div>
+          <span>우리 아이 유치원 찾기</span>
+        </div>
+        <div class="hint">회원가입</div>
+      </div>
+      <div class="hint">간단히 계정을 만들어 관심 목록을 저장해보세요 ✨</div>
+    </div>
+
+    <div class="content">
+      <div class="card">
+        <h1>처음 오셨나요? 반가워요 🐣</h1>
+        <p>이 화면은 <b>이메일 인증</b> 흐름을 포함한 샘플 UI입니다. (데모 모드: 실제 메일 발송은 하지 않고 화면에 코드가 표시됩니다.)</p>
+
+        <div class="field">
+          <div class="label">🧑 이름(닉네임)</div>
+          <input class="input" id="nickname" type="text" placeholder="예: 은솔아빠" autocomplete="name" />
+        </div>
+
+        <div class="field">
+          <div class="label">📧 아이디(이메일)</div>
+          <input class="input" id="email" type="email" placeholder="example@email.com" autocomplete="username" />
+        </div>
+
+        
+        <div class="field">
+          <div class="label">✅ 이메일 인증</div>
+          <div class="verify-row">
+            <button class="btn-outline" id="sendCodeBtn" type="button">인증번호 보내기</button>
+            <div class="verify-hint">메일로 받은 6자리 코드를 입력하세요<br/>(데모는 화면에 코드가 표시돼요)</div>
+          </div>
+          <div style="height:10px;"></div>
+          <div class="verify-row">
+            <input class="input" id="emailCode" type="text" inputmode="numeric" maxlength="6" placeholder="인증번호 6자리" />
+            <button class="btn-outline" id="verifyBtn" type="button">확인</button>
+          </div>
+          <div id="verifyMsg" class="verify-msg"></div>
+        </div>
+<div class="field">
+          <div class="label">🔒 비밀번호</div>
+          <input class="input" id="password" type="password" placeholder="비밀번호를 입력하세요" autocomplete="new-password" />
+        </div>
+
+        <div class="field">
+          <div class="label">🔁 비밀번호 확인</div>
+          <input class="input" id="password2" type="password" placeholder="비밀번호를 한번 더 입력하세요" autocomplete="new-password" />
+        </div>
+
+        <div class="btn-row">
+          <button class="btn primary" id="signupBtn" type="button" disabled>회원가입</button>
+          <button class="btn secondary" type="button" onclick="goLogin()">로그인으로</button>
+        </div>
+
+        <div class="link-row">
+          <a href="main.html" onclick="goHome(); return false;">🏠 메인으로 돌아가기</a>
+        </div>
+
+        <div class="note">💡 다음 단계(원하시면): 가입 시 입력 검증(비밀번호 규칙/중복 이메일), 가입 성공 시 자동 로그인, localStorage에 사용자/토큰 저장 등을 붙일 수 있어요.</div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function goLogin(){ window.location.href = 'login.html'; }
+    function goHome(){ window.location.href = 'main.html'; }
+  </script>
+
+  <script>
+  // 이메일 인증 (데모)
+  // 실제 이메일 전송은 서버(또는 이메일 API)가 필요합니다.
+  const CODE_KEY = 'emailVerifyCode';
+  const EXP_KEY = 'emailVerifyExp';
+  const OK_KEY  = 'emailVerified';
+
+  function genCode() {
+    return String(Math.floor(100000 + Math.random() * 900000));
+  }
+
+  function setMsg(el, msg, ok){
+    el.textContent = msg;
+    el.classList.toggle('ok', !!ok);
+    el.classList.toggle('bad', !ok);
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const sendBtn = document.getElementById('sendCodeBtn');
+    const verifyBtn = document.getElementById('verifyBtn');
+    const codeInput = document.getElementById('emailCode');
+    const msgEl = document.getElementById('verifyMsg');
+    const signupBtn = document.getElementById('signupBtn');
+
+    localStorage.removeItem(OK_KEY);
+    signupBtn.disabled = true;
+
+    sendBtn.addEventListener('click', () => {
+      const email = (document.getElementById('email')?.value || '').trim();
+      if (!email || !email.includes('@')) {
+        setMsg(msgEl, '이메일을 먼저 입력해주세요.', false);
+        return;
+      }
+      const code = genCode();
+      const exp = Date.now() + 5 * 60 * 1000; // 5분
+      localStorage.setItem(CODE_KEY, code);
+      localStorage.setItem(EXP_KEY, String(exp));
+      localStorage.removeItem(OK_KEY);
+
+      // 데모: 실제 이메일 전송 대신 안내
+      setMsg(msgEl, `인증번호를 보냈습니다(데모). 코드: ${code} (5분 유효)`, true);
+    });
+
+    verifyBtn.addEventListener('click', () => {
+      const input = (codeInput.value || '').trim();
+      const saved = localStorage.getItem(CODE_KEY) || '';
+      const exp = Number(localStorage.getItem(EXP_KEY) || '0');
+      if (!saved) { setMsg(msgEl, '먼저 인증번호를 보내주세요.', false); return; }
+      if (Date.now() > exp) { setMsg(msgEl, '인증번호가 만료되었습니다. 다시 보내주세요.', false); return; }
+      if (input === saved) {
+        localStorage.setItem(OK_KEY, 'true');
+        signupBtn.disabled = false;
+        setMsg(msgEl, '이메일 인증 완료!', true);
+      } else {
+        setMsg(msgEl, '인증번호가 일치하지 않습니다.', false);
+      }
+    });
+
+    // 가입 버튼 클릭(데모)
+    signupBtn.addEventListener('click', (e) => {
+      if (localStorage.getItem(OK_KEY) !== 'true') {
+        e.preventDefault();
+        setMsg(msgEl, '이메일 인증을 먼저 완료해주세요.', false);
+        return;
+      }
+      alert('회원가입 완료 (데모)');
+      window.location.href = 'login.html';
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,594 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>관심 목록</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    :root{
+      --bg:#f3f5ff;
+      --ink:#2b2f38;
+      --muted:#6b7280;
+      --brand:#667eea;
+      --brand2:#764ba2;
+      --shadow: 0 12px 35px rgba(0,0,0,0.10);
+      --navBase:72px;
+      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
+      --headerH: 110px;
+    }
+    body{
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+    }
+    .container{
+      max-width: 600px;
+      margin: 0 auto;
+      height: 100vh;
+      position: relative;
+      background: linear-gradient(135deg, #f6f7ff 0%, #fff2f6 100%);
+      box-shadow: 0 0 20px rgba(0,0,0,0.10);
+      overflow:hidden;
+      padding-bottom: calc(var(--navH) + 16px);
+    }
+
+    /* Header (favorite 디자인 + map 헤더 메뉴 구조) */
+    .header{
+      position:absolute;
+      top:0; left:0; right:0;
+      height: var(--headerH);
+      padding: 14px 16px 12px;
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+      color:white;
+      z-index: 140;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.10);
+    }
+    .title-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .app-title{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      font-weight: 900;
+      letter-spacing: -0.2px;
+      font-size: 17px;
+    }
+    .logo{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.22);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      backdrop-filter: blur(10px);
+      flex-shrink:0;
+    }
+    .logo span{ font-size: 18px; }
+
+    .count-chip{
+      background: rgba(255,255,255,0.22);
+      border: 1px solid rgba(255,255,255,0.35);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+      backdrop-filter: blur(10px);
+    }
+
+    .search-row{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+    }
+    .search-wrap{
+      flex:1;
+      position:relative;
+    }
+    .search-input{
+      width:100%;
+      border: none;
+      outline: none;
+      padding: 12px 40px 12px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+    }
+    .search-icon{
+      position:absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 18px;
+      opacity: 0.7;
+    }
+    .filter-btn{
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.35);
+      background: rgba(255,255,255,0.22);
+      color: white;
+      font-size: 20px;
+      cursor:pointer;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+      backdrop-filter: blur(10px);
+      transition: transform .12s ease, background .2s ease;
+      flex-shrink:0;
+    }
+    .filter-btn:active{ transform: scale(0.98); }
+    .filter-btn:hover{ background: rgba(255,255,255,0.28); }
+
+    /* Filter panel (map의 필터 메뉴를 favorite에 이식) */
+    .filter-panel{
+      position:absolute;
+      top: calc(var(--headerH) - 4px);
+      left: 14px;
+      right: 14px;
+      background: rgba(255,255,255,0.96);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.18);
+      display:none;
+      z-index: 150;
+      border: 1px solid rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      animation: slideDown 0.18s ease-out;
+    }
+    @keyframes slideDown{
+      from{ opacity:0; transform: translateY(-8px); }
+      to{ opacity:1; transform: translateY(0); }
+    }
+    .filter-panel.active{ display:block; }
+    .filter-title{
+      font-size: 14px;
+      font-weight: 900;
+      color: var(--ink);
+      margin-bottom: 10px;
+      letter-spacing:-0.2px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 8px;
+    }
+    .filter-sub{
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    .filter-options{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .filter-option{
+      padding: 8px 12px;
+      border: 1px solid rgba(102,126,234,0.18);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      cursor:pointer;
+      background: rgba(102,126,234,0.06);
+      color: #3b3f4a;
+      transition: transform .12s ease, background .2s ease, color .2s ease;
+    }
+    .filter-option:hover{ transform: translateY(-1px); }
+    .filter-option.active{
+      background: linear-gradient(135deg, var(--brand) 0%, var(--brand2) 100%);
+      color: white;
+      border-color: rgba(102,126,234,0.0);
+    }
+
+    /* Content */
+    .content{
+      position:absolute;
+      top: var(--headerH);
+      left:0; right:0;
+      bottom: 0;
+      overflow:auto;
+      padding: 14px 14px 18px;
+    }
+    .meta-bar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      margin: 6px 2px 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .meta-pill{
+      background: rgba(102,126,234,0.08);
+      border: 1px solid rgba(102,126,234,0.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .card{
+      background: rgba(255,255,255,0.95);
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(255,255,255,0.7);
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      margin-bottom: 12px;
+      cursor:pointer;
+      transition: transform .12s ease;
+    }
+    .card:active{ transform: scale(0.99); }
+    .badge{
+      width: 52px; height: 52px;
+      border-radius: 18px;
+      background: rgba(102,126,234,0.12);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 24px;
+      flex-shrink:0;
+    }
+    .info{ flex:1; min-width: 0; }
+    .name{
+      font-weight: 900;
+      letter-spacing:-0.2px;
+      font-size: 14px;
+      margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .meta{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+    .chip{
+      background: rgba(102,126,234,0.08);
+      border: 1px solid rgba(102,126,234,0.12);
+      padding: 6px 10px;
+      border-radius: 999px;
+    }
+
+    .actions{
+      display:flex;
+      gap: 8px;
+      flex-shrink:0;
+    }
+    .icon-btn{
+      width: 42px;
+      height: 42px;
+      border:none;
+      border-radius: 16px;
+      cursor:pointer;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+      background: white;
+      font-size: 18px;
+      transition: transform .12s ease;
+    }
+    .icon-btn:active{ transform: scale(0.98); }
+    .icon-btn.detail{ background: rgba(102,126,234,0.10); }
+    .icon-btn.fav{ background: rgba(255,107,107,0.12); }
+
+    .empty{
+      margin-top: 40px;
+      text-align:center;
+      color: var(--muted);
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    /* Bottom nav */
+    .bottom-nav{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: min(600px, 100%);
+      height: var(--navH);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      padding: 12px 0 calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 25px rgba(0,0,0,0.08);
+      z-index: 999;
+    }
+    .nav-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 4px;
+      color: #9aa0aa;
+      cursor:pointer;
+      user-select:none;
+      transition: color .2s ease;
+    }
+    .nav-item.active{ color: var(--brand); }
+    .nav-item:hover{ color: var(--brand); }
+    .nav-icon{ font-size: 22px; }
+    .nav-label{ font-size: 12px; font-weight: 800; }
+
+    /* overlay (패널 열렸을 때 클릭 영역) */
+    .overlay{
+      position:absolute;
+      inset: 0;
+      background: transparent;
+      display:none;
+      z-index: 145;
+    }
+    .overlay.active{ display:block; }
+  </style>
+  <script src="config.js"></script>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-row">
+        <div class="app-title">
+          <div class="logo"><span>❤️</span></div>
+          <span>관심 목록</span>
+        </div>
+        <div class="count-chip">총 <span id="countNum">0</span>개</div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-wrap">
+          <input id="searchInput" class="search-input" type="text" placeholder="관심 유치원 검색" />
+          <span class="search-icon">🔍</span>
+        </div>
+        <button class="filter-btn" id="filterBtn" onclick="toggleFilter()" aria-label="필터">⚙️</button>
+      </div>
+    </div>
+
+    <!-- overlay + filter panel -->
+    <div id="overlay" class="overlay" onclick="closeFilter()"></div>
+    <div class="filter-panel" id="filterPanel">
+      <div class="filter-title">
+        필터 옵션
+        <span class="filter-sub">표시중 <span id="showingCount">0</span>개</span>
+      </div>
+      <div class="filter-options">
+        <button class="filter-option active" onclick="filterType(this,'all')">전체</button>
+        <button class="filter-option" onclick="filterType(this,'public')">공립</button>
+        <button class="filter-option" onclick="filterType(this,'private')">사립</button>
+        <button class="filter-option" onclick="filterType(this,'national')">국립</button>
+        <button class="filter-option" onclick="filterType(this,'bus')">통학버스 🚌</button>
+        <button class="filter-option" onclick="filterType(this,'500m')">500m 이내</button>
+        <button class="filter-option" onclick="filterType(this,'1km')">1km 이내</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <div class="meta-bar">
+        <span class="meta-pill" id="activeFilterText">필터: 전체</span>
+        <span class="meta-pill">검색/필터는 관심 목록에서만 적용</span>
+      </div>
+      <div id="list"></div>
+      <div class="empty" id="empty" style="display:none;">
+        아직 관심으로 저장한 유치원이 없어요 🥺<br/>
+        지도에서 🤍 를 눌러 담아보세요!
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item" onclick="goHome()">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">홈</span>
+      </div>
+      <div class="nav-item" onclick="goMap()">
+        <span class="nav-icon">📍</span>
+        <span class="nav-label">지도</span>
+      </div>
+      <div class="nav-item active" onclick="goFavorite()">
+        <span class="nav-icon">❤️</span>
+        <span class="nav-label">관심</span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== 데이터(데모) =====
+    const KINDERGARTENS = [
+      { id: 1, name: "해바라기 유치원", type: "public",  bus: true,  dist: 300,  walk: "도보 5분",  icon: "🌻" },
+      { id: 2, name: "별초롱 유치원",   type: "private", bus: false, dist: 500,  walk: "도보 8분",  icon: "⭐" },
+      { id: 3, name: "무지개 어린이집", type: "public",  bus: false, dist: 750,  walk: "도보 10분", icon: "🌈" },
+      { id: 4, name: "푸른하늘 유치원", type: "private", bus: true,  dist: 850,  walk: "도보 12분", icon: "🎈" },
+      { id: 5, name: "국립 꿈나무 유치원", type: "national", bus: true, dist: 1200, walk: "도보 15분", icon: "🌸" },
+      { id: 6, name: "햇살가득 유치원", type: "private", bus: false, dist: 650,  walk: "도보 9분",  icon: "☀️" },
+      { id: 7, name: "사랑나눔 어린이집", type: "public", bus: true,  dist: 480,  walk: "도보 7분",  icon: "💛" },
+      { id: 8, name: "예쁜세상 유치원", type: "private", bus: true,  dist: 850,  walk: "도보 12분", icon: "🎀" }
+    ];
+
+    const FAV_KEY = "kg_favorites_v1";
+
+    function getFavSet(){
+      try{
+        const raw = localStorage.getItem(FAV_KEY);
+        const arr = raw ? JSON.parse(raw) : [];
+        return new Set(arr);
+      }catch(e){
+        return new Set();
+      }
+    }
+    function setFavSet(set){
+      localStorage.setItem(FAV_KEY, JSON.stringify([...set]));
+    }
+
+    function typeText(type){
+      if(type === "public") return "공립";
+      if(type === "national") return "국립";
+      return "사립";
+    }
+    function distText(m){
+      return m >= 1000 ? (m/1000).toFixed(1) + "km" : m + "m";
+    }
+
+    // ===== 상태 =====
+    const listEl = document.getElementById("list");
+    const emptyEl = document.getElementById("empty");
+    const countNumEl = document.getElementById("countNum");
+    const showingCountEl = document.getElementById("showingCount");
+    const activeFilterTextEl = document.getElementById("activeFilterText");
+    const overlayEl = document.getElementById("overlay");
+
+    let searchTerm = "";
+    let currentFilter = "all";
+
+    // ===== 필터 패널 =====
+    function toggleFilter(){
+      const panel = document.getElementById("filterPanel");
+      const willOpen = !panel.classList.contains("active");
+      panel.classList.toggle("active");
+      overlayEl.classList.toggle("active", willOpen);
+    }
+    function closeFilter(){
+      document.getElementById("filterPanel").classList.remove("active");
+      overlayEl.classList.remove("active");
+    }
+    function filterType(btn, type){
+      document.querySelectorAll(".filter-option").forEach(opt => opt.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = type;
+      closeFilter();
+      render();
+    }
+
+    function filterLabel(type){
+      switch(type){
+        case "public": return "공립";
+        case "private": return "사립";
+        case "national": return "국립";
+        case "bus": return "통학버스";
+        case "500m": return "500m 이내";
+        case "1km": return "1km 이내";
+        default: return "전체";
+      }
+    }
+
+    // ===== 렌더 =====
+    function getFilteredFavorites(){
+      const favSet = getFavSet();
+      const favItems = KINDERGARTENS.filter(x => favSet.has(x.id));
+
+      // 검색
+      const t = (searchTerm || "").trim().toLowerCase();
+      let filtered = t ? favItems.filter(x => x.name.toLowerCase().includes(t)) : favItems;
+
+      // 필터
+      switch(currentFilter){
+        case "public":
+        case "private":
+        case "national":
+          filtered = filtered.filter(x => x.type === currentFilter);
+          break;
+        case "bus":
+          filtered = filtered.filter(x => !!x.bus);
+          break;
+        case "500m":
+          filtered = filtered.filter(x => x.dist <= 500);
+          break;
+        case "1km":
+          filtered = filtered.filter(x => x.dist <= 1000);
+          break;
+        default:
+          break;
+      }
+
+      return { favItems, filtered };
+    }
+
+    function render(){
+      const favSet = getFavSet();
+      const favIds = [...favSet];
+
+      const { favItems, filtered } = getFilteredFavorites();
+
+      // 총 개수는 "관심 등록된 전체" 기준 유지
+      countNumEl.textContent = String(favIds.length);
+      showingCountEl.textContent = String(filtered.length);
+      activeFilterTextEl.textContent = "필터: " + filterLabel(currentFilter);
+
+      listEl.innerHTML = "";
+
+      if(filtered.length === 0){
+        // 즐겨찾기가 아예 없으면 empty 안내, 있으면 "조건에 맞는 항목 없음" 문구로 바꿔줌
+        if(favItems.length === 0){
+          emptyEl.style.display = "block";
+          emptyEl.innerHTML = "아직 관심으로 저장한 유치원이 없어요 🥺<br/>지도에서 🤍 를 눌러 담아보세요!";
+        }else{
+          emptyEl.style.display = "block";
+          emptyEl.innerHTML = "조건에 맞는 관심 유치원이 없어요 🧐<br/>검색어/필터를 변경해 보세요!";
+        }
+        return;
+      }
+      emptyEl.style.display = "none";
+
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <div class="badge">${item.icon}</div>
+          <div class="info">
+            <div class="name">${item.name}</div>
+            <div class="meta">
+              <span class="chip">🏷️ ${typeText(item.type)}</span>
+              <span class="chip">📏 ${distText(item.dist)} · ${item.walk}</span>
+              <span class="chip">${item.bus ? "🚌 통학" : "도보"}</span>
+            </div>
+          </div>
+          <div class="actions">
+            <button class="icon-btn detail" aria-label="상세" onclick="goDetail(${item.id}); event.stopPropagation();">🔎</button>
+            <button class="icon-btn fav" aria-label="관심해제" onclick="removeFavorite(${item.id}); event.stopPropagation();">❤️</button>
+          </div>
+        `;
+        card.addEventListener("click", () => goDetail(item.id));
+        listEl.appendChild(card);
+      });
+    }
+
+    function goDetail(id){ window.location.href = `detail.html?id=${id}`; }
+    function removeFavorite(id){
+      const set = getFavSet();
+      set.delete(id);
+      setFavSet(set);
+      render();
+    }
+
+    // 검색 입력(기존 기능 유지)
+    document.getElementById("searchInput").addEventListener("input", (e) => {
+      searchTerm = e.target.value || "";
+      render();
+    });
+
+    // ESC로 닫기
+    window.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeFilter();
+    });
+
+    // 탭 이동
+    function goHome(){ window.location.href = "main.html"; }
+    function goMap(){ window.location.href = "map.html"; }
+    function goFavorite(){ window.location.href = "favorite.html"; }
+
+    render();
+  </script>
+</body>
+</html>

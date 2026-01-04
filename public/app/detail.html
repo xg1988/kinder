@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>유치원 상세정보</title>
+    <style>
+    :root{--navBase: 72px; --navH: calc(var(--navBase) + env(safe-area-inset-bottom));}
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            padding-bottom: calc(var(--navH) + 12px);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+
+        /* 상단 헤더 */
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* 메인 이미지 */
+        .main-image {
+            width: 100%;
+            height: 250px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 80px;
+            position: relative;
+        }
+
+        .favorite-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .favorite-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .favorite-btn.active {
+            animation: heartbeat 0.3s;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        /* 기본 정보 */
+        .info-section {
+            padding: 25px 20px;
+            border-bottom: 10px solid #f5f5f5;
+        }
+
+        .kindergarten-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0;
+        }
+
+        .kindergarten-type {
+            display: inline-block;
+            background: #e5f3ff;
+            color: #4dabf7;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 0;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 0;
+            font-size: 14px;
+        }
+
+        .info-icon {
+            font-size: 20px;
+            width: 25px;
+            flex-shrink: 0;
+        }
+
+        .info-text {
+            color: #666;
+            line-height: 1.6;
+            flex: 1;
+        }
+
+        .info-label {
+            color: #999;
+            font-size: 13px;
+            margin-bottom: 0;
+        }
+
+        .info-value {
+            color: #333;
+            font-weight: 500;
+        }
+
+        /* 섹션 타이틀 */
+        .section-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 운영 정보 */
+        .operation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .operation-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .operation-label {
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 0;
+        }
+
+        .operation-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 프로그램 태그 */
+        .program-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .program-tag {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* 시설 정보 */
+        .facility-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .facility-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .facility-icon {
+            font-size: 30px;
+            margin-bottom: 0;
+        }
+
+        .facility-name {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* 버스 노선 */
+        .bus-route {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .bus-info {
+            font-size: 14px;
+            color: #856404;
+            line-height: 1.6;
+        }
+
+        /* 지도 영역 */
+        .map-container {
+            width: 100%;
+            height: 200px;
+            background: #e9ecef;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #666;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .map-placeholder {
+            text-align: center;
+        }
+
+        .map-icon {
+            font-size: 48px;
+            margin-bottom: 0;
+        }
+
+        /* 액션 버튼 */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            padding: 20px;
+            background: white;
+            position: sticky;
+            bottom: 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+
+        .action-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-call {
+            background: #4dabf7;
+            color: white;
+        }
+
+        .btn-call:hover {
+            background: #339af0;
+        }
+
+        .btn-website {
+            background: #51cf66;
+            color: white;
+        }
+
+        .btn-website:hover {
+            background: #37b24d;
+        }
+
+        /* 리뷰 섹션 */
+        .review-summary {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 0;
+        }
+
+        .rating-score {
+            font-size: 36px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .rating-stars {
+            font-size: 20px;
+            color: #ffd43b;
+        }
+
+        .rating-count {
+            font-size: 13px;
+            color: #999;
+        }
+
+        /* 스크롤 애니메이션 */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    
+        /* 하단 탭바 (공통) */
+        .bottom-nav{
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: min(600px, 100%);
+      height: var(--navH);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(10px);
+      display:flex;
+      justify-content:space-around;
+      align-items:center;
+      padding: 12px 0 calc(10px + env(safe-area-inset-bottom));
+      box-shadow: 0 -8px 25px rgba(0,0,0,0.08);
+      z-index: 999;
+    }
+        .nav-item{
+            display:flex;
+            flex-direction:column;
+            align-items:center;
+            gap: 4px;
+            cursor:pointer;
+            color:#999;
+            transition: color .2s;
+            flex:1;
+        }
+        .nav-item:hover{ color: #667eea; }
+        .nav-icon{ font-size: 24px; }
+        .nav-label{ font-size: 12px; font-weight: 600; }
+
+        </style>
+  <script src="config.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 상단 헤더 -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="header-title">유치원 상세정보</div>
+        </div>
+
+        <!-- 메인 이미지 -->
+        <div class="main-image">
+            🌻
+            <button class="favorite-btn" id="favoriteBtn" onclick="toggleFavorite()">
+                🤍
+            </button>
+        </div>
+
+        <!-- 기본 정보 -->
+        <div class="info-section fade-in">
+            <h1 class="kindergarten-name">해바라기 유치원</h1>
+            <span class="kindergarten-type">사립</span>
+
+            <div class="info-row">
+                <span class="info-icon">📍</span>
+                <div class="info-text">
+                    <div class="info-label">주소</div>
+                    <div class="info-value">서울특별시 강남구 테헤란로 123 (역삼동)</div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="info-icon">📞</span>
+                <div class="info-text">
+                    <div class="info-label">전화번호</div>
+                    <div class="info-value">02-1234-5678</div>
+                </div>
+            </div>
+
+            <div class="info-row">
+                <span class="info-icon">🚶</span>
+                <div class="info-text">
+                    <div class="info-label">현재 위치에서</div>
+                    <div class="info-value">도보 5분 (300m)</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 운영 정보 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>⏰</span>
+                운영 정보
+            </div>
+
+            <div class="operation-grid">
+                <div class="operation-item">
+                    <div class="operation-label">운영시간</div>
+                    <div class="operation-value">07:30 - 19:30</div>
+                </div>
+                <div class="operation-item">
+                    <div class="operation-label">정원</div>
+                    <div class="operation-value">120명</div>
+                </div>
+                <div class="operation-item">
+                    <div class="operation-label">현원</div>
+                    <div class="operation-value">95명</div>
+                </div>
+                <div class="operation-item">
+                    <div class="operation-label">학급수</div>
+                    <div class="operation-value">6학급</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 교육 프로그램 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>📚</span>
+                특별 프로그램
+            </div>
+            <div class="program-tags">
+                <span class="program-tag">영어교육</span>
+                <span class="program-tag">체육활동</span>
+                <span class="program-tag">미술교육</span>
+                <span class="program-tag">음악교육</span>
+                <span class="program-tag">과학탐구</span>
+                <span class="program-tag">독서지도</span>
+            </div>
+        </div>
+
+        <!-- 시설 정보 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>🏢</span>
+                시설 안내
+            </div>
+            <div class="facility-list">
+                <div class="facility-item">
+                    <div class="facility-icon">🎨</div>
+                    <div class="facility-name">미술실</div>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🏃</div>
+                    <div class="facility-name">체육관</div>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">📚</div>
+                    <div class="facility-name">도서실</div>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🎵</div>
+                    <div class="facility-name">음악실</div>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🌳</div>
+                    <div class="facility-name">야외놀이터</div>
+                </div>
+                <div class="facility-item">
+                    <div class="facility-icon">🍱</div>
+                    <div class="facility-name">급식실</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 통학버스 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>🚌</span>
+                통학버스 운영
+            </div>
+            <div class="bus-route">
+                <div class="bus-info">
+                    ✓ 통학버스 운영 중<br>
+                    ✓ 노선: 역삼동 → 대치동 → 도곡동<br>
+                    ✓ 운행시간: 오전 7시 30분 출발<br>
+                    ✓ 하원시간: 오후 5시 / 6시 2회 운행
+                </div>
+            </div>
+        </div>
+
+        <!-- 리뷰 요약 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>⭐</span>
+                학부모 평가
+            </div>
+            <div class="review-summary">
+                <div>
+                    <div class="rating-score">4.5</div>
+                    <div class="rating-stars">★★★★☆</div>
+                </div>
+                <div>
+                    <div class="info-value">매우 만족</div>
+                    <div class="rating-count">총 48개 리뷰</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 지도 -->
+        <div class="info-section fade-in">
+            <div class="section-title">
+                <span>🗺️</span>
+                위치
+            </div>
+            <div class="map-container">
+                <div class="map-placeholder">
+                    <div class="map-icon">📍</div>
+                    <div>카카오맵/네이버맵 API 연동 영역</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼 -->
+        <div class="action-buttons">
+            <button class="action-btn btn-call" onclick="makeCall()">
+                📞 전화하기
+            </button>
+            <button class="action-btn btn-website" onclick="openWebsite()">
+                🌐 홈페이지
+            </button>
+        </div>
+    </div>
+
+    <script>
+  // 공통 뒤로가기: 히스토리가 없으면 홈으로
+  function goBack() {
+    try {
+      if (window.history.length > 1) {
+        window.history.back();
+      } else {
+        window.location.href = 'main.html';
+      }
+    } catch (e) {
+      window.location.href = 'main.html';
+    }
+  }
+
+  // 관심 토글 (데모: localStorage)
+  function toggleFavorite() {
+    const id = new URLSearchParams(location.search).get('id') || '1';
+    const key = 'favorites';
+    const list = JSON.parse(localStorage.getItem(key) || '[]');
+    const idx = list.indexOf(id);
+    if (idx >= 0) list.splice(idx, 1); else list.push(id);
+    localStorage.setItem(key, JSON.stringify(list));
+
+    const btn = document.getElementById('favoriteBtn');
+    if (btn) btn.classList.toggle('active', idx < 0);
+  }
+
+  function callPhone() {
+    alert('전화 연결 (데모)
+실제 앱/웹에서는 tel: 링크를 사용하세요.');
+  }
+
+  function openWebsite() {
+    alert('홈페이지 이동 (데모)');
+  }
+
+  // 초기 상태
+  window.addEventListener('DOMContentLoaded', () => {
+    const id = new URLSearchParams(location.search).get('id') || '1';
+    const list = JSON.parse(localStorage.getItem('favorites') || '[]');
+    const btn = document.getElementById('favoriteBtn');
+    if (btn) btn.classList.toggle('active', list.includes(id));
+  });
+</script>
+
+        <!-- 하단 탭바 -->
+        <div class="bottom-nav">
+            <div class="nav-item" onclick="window.location.href='main.html'">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">홈</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='map.html'">
+                <span class="nav-icon">📍</span>
+                <span class="nav-label">지도</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='favorite.html'">
+                <span class="nav-icon">❤️</span>
+                <span class="nav-label">관심</span>
+            </div>
+        </div>
+</body>
+</html>
