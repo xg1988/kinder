@@ -8,8 +8,6 @@
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root{
-      --navBase: 78px;
-      --headerH: 86px;
       --bg: #f3f5ff;
       --card: #ffffff;
       --ink: #2b2f38;
@@ -17,7 +15,7 @@
       --brand: #667eea;
       --brand2:#764ba2;
       --shadow: 0 12px 35px rgba(0,0,0,0.10);
-      --navH: calc(var(--navBase) + env(safe-area-inset-bottom, 0px));
+      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
       --radius: 18px;
     }
     html, body{height:100%;}
@@ -31,12 +29,12 @@
     .container{
       max-width: 600px;
       margin: 0 auto;
-      height: 100vh;
+      height: 100dvh; min-height: 100dvh;
       position: relative;
       background: linear-gradient(135deg, #f6f7ff 0%, #fff2f6 100%);
       box-shadow: 0 0 20px rgba(0,0,0,0.10);
       overflow: hidden;
-      padding-bottom: 0;
+            padding-bottom: calc(var(--navH) + 80px);
     }
 
     /* Header */
@@ -96,11 +94,11 @@
     .content{
       position:absolute;
       left:0; right:0;
-      top: var(--headerH);
-      bottom: var(--navH);
+      top: 86px; /* header total height */
+      bottom: 0;
       overflow: auto;
-      -webkit-overflow-scrolling: touch;
       padding: 16px;
+      padding-bottom: calc(var(--navH) + 16px);
     }
 
     .hero{
@@ -185,12 +183,14 @@
     /* Bottom Nav */
     .bottom-nav{
       position: fixed;
+
       left: 0;
       right: 0;
       margin: 0 auto;
-      bottom: 0;
-      width: 100%;
       max-width: 600px;
+      width: 100%;
+
+      bottom: 0;
       height: var(--navH);
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(10px);
@@ -302,120 +302,6 @@
       color: var(--ink);
     }
     
-
-    /* Swiper (no library) */
-    .swiper{
-      margin: 14px 0 12px;
-      border-radius: 22px;
-      overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0,0,0,0.10);
-      border: 1px solid rgba(255,255,255,0.7);
-      background: rgba(255,255,255,0.85);
-      position: relative;
-    }
-    .swiper-track{
-      display:flex;
-      transition: transform .35s ease;
-      will-change: transform;
-      touch-action: pan-y;
-    }
-    .slide{
-      min-width: 100%;
-      padding: 18px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap: 12px;
-    }
-    .slide-left{min-width:0;}
-    .slide-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      font-size: 12px;
-      font-weight: 900;
-      padding: 7px 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.22);
-      color: #fff;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 24px rgba(0,0,0,0.12);
-    }
-    .slide-title{
-      margin-top: 10px;
-      font-size: 18px;
-      font-weight: 950;
-      letter-spacing: -0.3px;
-      color: #fff;
-      line-height: 1.2;
-      text-shadow: 0 10px 24px rgba(0,0,0,0.18);
-    }
-    .slide-desc{
-      margin-top: 6px;
-      font-size: 12px;
-      color: rgba(255,255,255,0.88);
-      line-height: 1.45;
-      max-width: 320px;
-    }
-    .slide-actions{
-      margin-top: 12px;
-      display:flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-    .chip-btn{
-      border:none;
-      cursor:pointer;
-      border-radius: 14px;
-      padding: 10px 12px;
-      font-weight: 900;
-      font-size: 12px;
-      letter-spacing: -0.2px;
-      color:#1f2937;
-      background: rgba(255,255,255,0.92);
-      box-shadow: 0 10px 22px rgba(0,0,0,0.14);
-      transition: transform .12s ease;
-      white-space:nowrap;
-    }
-    .chip-btn:active{ transform: scale(0.98); }
-    .slide-emoji{
-      width: 64px;
-      height: 64px;
-      border-radius: 22px;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size: 34px;
-      background: rgba(255,255,255,0.22);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 14px 28px rgba(0,0,0,0.14);
-      flex-shrink:0;
-    }
-    .swiper-dots{
-      position:absolute;
-      left: 0; right: 0;
-      bottom: 10px;
-      display:flex;
-      justify-content:center;
-      gap: 6px;
-      pointer-events: none;
-    }
-    .dot{
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.45);
-      box-shadow: 0 6px 14px rgba(0,0,0,0.14);
-      transition: transform .2s, background .2s;
-    }
-    .dot.active{
-      background: rgba(255,255,255,0.95);
-      transform: scale(1.25);
-    }
-    .slide.bg1{ background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%); }
-    .slide.bg2{ background: linear-gradient(135deg, #ff512f 0%, #dd2476 100%); }
-    .slide.bg3{ background: linear-gradient(135deg, #1d976c 0%, #93f9b9 100%); }
-
   </style>
   <script src="config.js"></script>
 </head>
@@ -428,6 +314,7 @@
           <span>우리 아이 유치원 찾기</span>
         </div>
                 <div class="header-actions">
+                  <div class="header-actions">
           <div class="hint">오늘도 좋은 하루!</div>
           <button class="login-btn" onclick="goLogin()" aria-label="로그인">🔐</button>
         </div>
@@ -444,53 +331,25 @@
         <div class="cta-row">
           <button class="cta" onclick="goMap()">지도 보기</button>
           <button class="cta secondary" onclick="goFavorite()">관심 목록</button>
-        
-      </div><!-- /.hero -->
-
-      <div class="swiper" id="promoSwiper" aria-label="프로모션 배너">
-        <div class="swiper-track" id="promoTrack">
-          <div class="slide bg1">
-            <div class="slide-left">
-              <div class="slide-kicker">📍 지도 · 필터</div>
-              <div class="slide-title">조건별 유치원 찾기</div>
-              <div class="slide-desc">공립/사립/국립, 통학버스, 거리까지 한 번에 필터링해요.</div>
-              <div class="slide-actions">
-                <button class="chip-btn" onclick="goMap()">지도에서 찾기 →</button>
-                <button class="chip-btn" onclick="window.location.href='map.html#filter'">필터 열기 ⚙️</button>
-              </div>
-            </div>
-            <div class="slide-emoji">🗺️</div>
-          </div>
-
-          <div class="slide bg2">
-            <div class="slide-left">
-              <div class="slide-kicker">❤️ 관심 · 비교</div>
-              <div class="slide-title">관심 목록으로 비교</div>
-              <div class="slide-desc">마음에 드는 곳을 담아두고, 상세정보를 빠르게 다시 확인해요.</div>
-              <div class="slide-actions">
-                <button class="chip-btn" onclick="goFavorite()">관심 목록 →</button>
-                <button class="chip-btn" onclick="window.location.href='favorite.html#tips'">정리 팁 보기 ✨</button>
-              </div>
-            </div>
-            <div class="slide-emoji">💖</div>
-          </div>
-
-          <div class="slide bg3">
-            <div class="slide-left">
-              <div class="slide-kicker">🎒 준비 · 체크</div>
-              <div class="slide-title">입학 준비 체크</div>
-              <div class="slide-desc">필수 서류/준비물 체크리스트로 놓치지 않게 준비해요.</div>
-              <div class="slide-actions">
-                <button class="chip-btn" onclick="window.location.href='detail.html?id=1'">체크리스트 보기 →</button>
-              </div>
-            </div>
-            <div class="slide-emoji">🧾</div>
-          </div>
         </div>
-        <div class="swiper-dots" id="promoDots" aria-hidden="true">
-          <div class="dot active"></div>
-          <div class="dot"></div>
-          <div class="dot"></div>
+
+      <div class="banner-row">
+        <div class="banner" onclick="window.location.href='map.html'">
+          <div class="b-emoji">🚌</div>
+          <div class="b-txt">
+            <div class="b-title">통학버스 유치원</div>
+            <div class="b-desc">지도에서 필터로 빠르게 찾아요</div>
+          </div>
+          <div class="b-cta">→</div>
+        </div>
+
+        <div class="banner soft" onclick="window.location.href='detail.html?id=1'">
+          <div class="b-emoji">🎒</div>
+          <div class="b-txt">
+            <div class="b-title">입학 준비 체크</div>
+            <div class="b-desc">필수 서류·준비물 한 번에</div>
+          </div>
+          <div class="b-cta">→</div>
         </div>
       </div>
 
@@ -548,7 +407,11 @@
       </div>
     </div>
 
-    <div class="bottom-nav">
+    
+  </div>
+
+  
+  <div class="bottom-nav">
       <div class="nav-item active" onclick="goHome()">
         <span class="nav-icon">🏠</span>
         <span class="nav-label">홈</span>
@@ -562,9 +425,8 @@
         <span class="nav-label">관심</span>
       </div>
     </div>
-  </div>
 
-  <script>
+<script>
     function goHome(){ window.location.href = "main.html"; }
     function goMap(){ window.location.href = "map.html"; }
     function goFavorite(){ window.location.href = "favorite.html"; }
@@ -572,85 +434,6 @@
     function goLogin(){
       window.location.href = "login.html";
     }
-
-    // --- Simple swiper (no external library) ---
-    (function(){
-      const track = document.getElementById('promoTrack');
-      const dotsWrap = document.getElementById('promoDots');
-      if(!track || !dotsWrap) return;
-
-      const dots = Array.from(dotsWrap.querySelectorAll('.dot'));
-      const slideCount = track.children.length;
-      let index = 0;
-      let startX = 0, currentX = 0, dragging = false;
-      let width = 0;
-      let timer = null;
-
-      function measure(){ width = track.parentElement.clientWidth; }
-      window.addEventListener('resize', measure);
-      measure();
-
-      function setActive(i){
-        index = (i + slideCount) % slideCount;
-        track.style.transform = `translateX(${-index * width}px)`;
-        dots.forEach((d, di)=> d.classList.toggle('active', di === index));
-      }
-
-      function next(){ setActive(index + 1); }
-      function startAuto(){
-        stopAuto();
-        timer = setInterval(next, 4500);
-      }
-      function stopAuto(){
-        if(timer) clearInterval(timer);
-        timer = null;
-      }
-
-      // Pointer swipe
-      track.addEventListener('pointerdown', (e)=>{
-        dragging = true;
-        startX = e.clientX;
-        currentX = startX;
-        track.setPointerCapture(e.pointerId);
-        track.style.transition = 'none';
-        stopAuto();
-      });
-      track.addEventListener('pointermove', (e)=>{
-        if(!dragging) return;
-        currentX = e.clientX;
-        const dx = currentX - startX;
-        track.style.transform = `translateX(${(-index * width) + dx}px)`;
-      });
-      function endSwipe(){
-        if(!dragging) return;
-        dragging = false;
-        track.style.transition = 'transform .35s ease';
-        const dx = currentX - startX;
-        const threshold = Math.max(50, width * 0.18);
-        if(dx > threshold) setActive(index - 1);
-        else if(dx < -threshold) setActive(index + 1);
-        else setActive(index);
-        startAuto();
-      }
-      track.addEventListener('pointerup', endSwipe);
-      track.addEventListener('pointercancel', endSwipe);
-      track.addEventListener('pointerleave', endSwipe);
-
-      // Tap dots
-      dotsWrap.style.pointerEvents = 'auto';
-      dots.forEach((d, i)=>{
-        d.style.cursor = 'pointer';
-        d.addEventListener('click', ()=>{
-          setActive(i);
-          startAuto();
-        });
-      });
-
-      // Init
-      setActive(0);
-      startAuto();
-    })();
-
 </script>
 </body>
 </html>
