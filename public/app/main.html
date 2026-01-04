@@ -17,7 +17,7 @@
       --brand: #667eea;
       --brand2:#764ba2;
       --shadow: 0 12px 35px rgba(0,0,0,0.10);
-      --navH: calc(var(--navBase) + env(safe-area-inset-bottom));
+      --navH: calc(var(--navBase) + env(safe-area-inset-bottom, 0px));
       --radius: 18px;
     }
     html, body{height:100%;}
@@ -185,10 +185,12 @@
     /* Bottom Nav */
     .bottom-nav{
       position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
+      left: 0;
+      right: 0;
+      margin: 0 auto;
       bottom: 0;
-      width: min(600px, 100%);
+      width: 100%;
+      max-width: 600px;
       height: var(--navH);
       background: rgba(255,255,255,0.92);
       backdrop-filter: blur(10px);
